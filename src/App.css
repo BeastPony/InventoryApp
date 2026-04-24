@@ -1,0 +1,237 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+  background: #d1d1d1;
+  margin: 0;
+  padding: 20px;
+}
+
+.container {
+  max-width: 1300px;
+  margin: 0 auto;
+  background: rgb(184, 184, 184);
+  border-radius: 5px;
+  padding: 20px 30px 30px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+}
+
+h1 {
+  text-align: center;
+  color: #000000;
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+/* Вкладки */
+.tabs {
+  display: flex;
+  gap: 5px;
+  border-bottom: 2px solid #9ffd79;
+  margin-bottom: 25px;
+}
+
+.tab {
+  background: none;
+  border: none;
+  padding: 10px 24px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: #ffffff;
+  background-color: #000000;
+  border-radius: 5px;
+  transition: 0.2s;
+}
+
+.tab.active {
+  color: #000000;
+  background: #9ffd79;
+}
+
+.tab:hover:not(.active) {
+  background: #9ffd79;
+}
+
+/* Формы */
+.data-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  background: #e4e4e4;
+  padding: 15px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+  align-items: flex-end;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.data-form input, .data-form select {
+  flex: 1;
+  min-width: 140px;
+  padding: 10px 5px;
+  border: 1px solid #cbd5e1;
+  border-radius: 5px;
+  font-size: 0.80rem;
+  background: white;
+}
+
+.data-form input:focus, .data-form select:focus {
+  outline: none;
+  border-color: #9ffd79;
+}
+
+.data-form button {
+  background: #000000;
+  color: white;
+  border: none;
+  padding: 11px 24px;
+  border-radius: 5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.data-form button:hover {
+  color: rgb(0, 0, 0);
+  background: #9ffd79;
+}
+
+.cancel-btn {
+  background: #000000 !important;
+}
+.cancel-btn:hover {
+  background: #9ffd79 !important;
+}
+
+/* Таблицы */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 10px 0;
+  border-radius: 5px;
+  overflow-x: auto;
+  display: block;
+}
+
+.data-table thead tr {
+  background: #e4e4e4;
+  text-align: left;
+}
+
+.data-table th, .data-table td {
+  padding: 0 10px;
+  border-bottom: 1px solid rgb(184, 184, 184);
+  text-align: left;
+}
+
+.data-table tbody tr {
+   background: #e4e4e4;
+}
+
+.data-table tbody tr:hover {
+  background: #9ffd79;
+}
+
+/* Статусные бейджи */
+.status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+.status-active { background: #dcfce7; color: #15803d; }
+.status-repair, .status-maintenance { background: #fed7aa; color: #9a3412; }
+.status-stock, .status-maintenance { background: #ff9101; color: #e5ff00; }
+.status-offline { background: #fee2e2; color: #b91c1c; }
+.status-storage { background: #e0e7ff; color: #3730a3; }
+.status-written_off { background: #e2e8f0; color: #334155; }
+
+/* Кнопки действий */
+.edit-btn, .delete-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  margin: 0 4px;
+  border-radius: 30px;
+}
+.edit-btn:hover { background: #e0e7ff; }
+.delete-btn:hover { background: #fee2e2; }
+
+.empty-message {
+  text-align: center;
+  padding: 40px;
+  background: #f1f5f9;
+  border-radius: 24px;
+  color: #475569;
+}
+
+.export-section {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #9ffd79;
+}
+
+.export-btn, .import-btn {
+  background: #000000;
+  color: white;
+  border: 1px solid #cbd5e1;
+  padding: 8px 20px;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  font-weight: 500;
+  display: inline-block;
+}
+.export-btn:hover, .import-btn:hover {
+  color: black;
+  background: #9ffd79;
+}
+
+.warehouse-selector {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #9ffd79;
+}
+
+.warehouse-btn {
+  background: none;
+  border: none;
+  padding: 10px 24px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: #ffffff;
+  background-color: #000000;
+  border-radius: 5px;
+  transition: 0.2s;
+}
+
+.warehouse-btn:hover{
+  color: white;
+  background: #9ffd79;
+}
+
+.warehouse-btn.active {
+  background: #9ffd79;
+  color: black;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.warehouse-content h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: black;
+  font-size: 1.2rem;
+}
