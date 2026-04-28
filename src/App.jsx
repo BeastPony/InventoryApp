@@ -13,7 +13,14 @@ import { CartridgeTable } from './components/CartridgeTable';
 import './App.css';
 
 function App() {
-  const [activeTab, setActiveTab] = useState('notebook');
+  const [activeTab, setActiveTab] = useState(() => {
+    return localStorage.getItem('activeTab') || 'notebook';
+  });
+
+  const handleTabChange = (tabId) => {
+    setActiveTab(tabId);
+    localStorage.setItem('activeTab', tabId);
+  };
 
   const { data: notebooks, setData: setNotebooks, loading: notebooksLoading } = useApi(api.getNotebooks, []);
   const { data: printers, setData: setPrinters, loading: printersLoading } = useApi(api.getPrinters, []);
@@ -210,7 +217,7 @@ function App() {
   return (
     <div className="container">
       <h1>IT-оборудование</h1>
-      <Tabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
+      <Tabs tabs={tabs} activeTab={activeTab} onTabChange={handleTabChange} />
 
       {activeTab === 'notebook' && (
         <div className="tab-content">
