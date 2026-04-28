@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
-import { useLocalStorage } from './hooks/useLocalStorage';
+import { api } from './api';
+import { useApi } from './hooks/useApi';
 import { Tabs } from './components/Tabs';
 import { ImportExport } from './components/ImportExport';
 import { NotebookForm } from './components/NotebookForm';
@@ -14,166 +15,189 @@ import './App.css';
 function App() {
   const [activeTab, setActiveTab] = useState('notebook');
 
-  // ----- Ноутбуки -----
-  const [notebooks, setNotebooks] = useLocalStorage('notebook', []);
-  const [notebookForm, setNotebookForm] = useState({ invNumber: '', computerName: '', currentUser: '', location: '', serviceTag: '', model: '', status: 'active' });
-  const [editingNotebookId, setEditingNotebookId] = useState(null);
-
-  // ----- Принтеры -----
-  const [printers, setPrinters] = useLocalStorage('printers', []);
-  const [printerForm, setPrinterForm] = useState({ name: '', location: '', model: '', serial: '', ipAddress: '', status: 'active'});
-  const [editingPrinterId, setEditingPrinterId] = useState(null);
-
-  // ----- Картриджи -----
-  const [cartridges, setCartridges] = useLocalStorage('cartridges', []);
-  const [cartridgeForm, setCartridgeForm] = useState({ printerModel: '', cartridgeModel: '', quantity: ''});
-  const [editingCartridgeId, setEditingCartridgeId] = useState(null);
-
-  // Ref для компонента оборудования (чтобы вызывать его методы экспорта/импорта)
+  const { data: notebooks, setData: setNotebooks, loading: notebooksLoading } = useApi(api.getNotebooks, []);
+  const { data: printers, setData: setPrinters, loading: printersLoading } = useApi(api.getPrinters, []);
+  const { data: cartridges, setData: setCartridges, loading: cartridgesLoading } = useApi(api.getCartridges, []);
   const equipmentRef = useRef();
 
-  // --- Функции для ноутбуков ---
-  const submitNotebook = () => {
-    if (editingNotebookId !== null) {
-      setNotebooks(notebooks.map(item =>
-        item.id === editingNotebookId ? { ...notebookForm, id: editingNotebookId } : item
-      ));
+  // Состояния форм (camelCase)
+  const [notebookForm, setNotebookForm] = useState({
+    invNumber: '', computerName: '', currentUser: '', location: '', serviceTag: '', model: '', status: 'active'
+  });
+  const [editingNotebookId, setEditingNotebookId] = useState(null);
+
+  const [printerForm, setPrinterForm] = useState({
+    name: '', location: '', model: '', serial: '', ipAddress: '', status: 'active'
+  });
+  const [editingPrinterId, setEditingPrinterId] = useState(null);
+
+  const [cartridgeForm, setCartridgeForm] = useState({
+    printerModel: '', cartridgeModel: '', quantity: ''
+  });
+  const [editingCartridgeId, setEditingCartridgeId] = useState(null);
+
+  // --- Ноутбуки ---
+  const submitNotebook = async () => {
+    const id = editingNotebookId || Date.now();
+    const notebook = { id, ...notebookForm };
+    if (editingNotebookId) {
+      await api.updateNotebook(notebook);
+      setNotebooks(prev => prev.map(n => n.id === editingNotebookId ? notebook : n));
       setEditingNotebookId(null);
     } else {
-      setNotebooks([...notebooks, { ...notebookForm, id: Date.now() }]);
+      await api.addNotebook(notebook);
+      setNotebooks(prev => [...prev, notebook]);
     }
-    setNotebookForm({ invNumber: '', computerName: '', currentUser: '', location: '', serviceTag: '', model: '', status: 'active' });
+    resetNotebookForm();
   };
 
-  const deleteNotebook = (id) => {
+  const deleteNotebook = async (id) => {
     if (window.confirm('Удалить ноутбук?')) {
-      setNotebooks(notebooks.filter(item => item.id !== id));
+      await api.deleteNotebook(id);
+      setNotebooks(prev => prev.filter(n => n.id !== id));
     }
   };
 
-  const editNotebook = (notebook) => {
-    setNotebookForm({ ...notebook });
-    setEditingNotebookId(notebook.id);
+  const editNotebook = (item) => {
+    setNotebookForm({ ...item });
+    setEditingNotebookId(item.id);
   };
 
   const cancelNotebookEdit = () => {
-    setNotebookForm({ invNumber: '', computerName: '', currentUser: '', location: '', serviceTag: '', model: '', status: 'active' });
+    resetNotebookForm();
     setEditingNotebookId(null);
   };
 
-  // --- Функции для принтеров ---
-  const submitPrinter = () => {
-    if (editingPrinterId !== null) {
-      setPrinters(printers.map(p =>
-        p.id === editingPrinterId ? { ...printerForm, id: editingPrinterId } : p
-      ));
+  const resetNotebookForm = () => {
+    setNotebookForm({ invNumber: '', computerName: '', currentUser: '', location: '', serviceTag: '', model: '', status: 'active' });
+  };
+
+  // --- Принтеры ---
+  const submitPrinter = async () => {
+    const id = editingPrinterId || Date.now();
+    const printer = { id, ...printerForm };
+    if (editingPrinterId) {
+      await api.updatePrinter(printer);
+      setPrinters(prev => prev.map(p => p.id === editingPrinterId ? printer : p));
       setEditingPrinterId(null);
     } else {
-      setPrinters([...printers, { ...printerForm, id: Date.now() }]);
+      await api.addPrinter(printer);
+      setPrinters(prev => [...prev, printer]);
     }
-    setPrinterForm({ name: '', location: '', model: '', serial: '', ipAddress: '', status: 'active'});
+    resetPrinterForm();
   };
 
-  const deletePrinter = (id) => {
+  const deletePrinter = async (id) => {
     if (window.confirm('Удалить принтер?')) {
-      setPrinters(printers.filter(p => p.id !== id));
+      await api.deletePrinter(id);
+      setPrinters(prev => prev.filter(p => p.id !== id));
     }
   };
 
-  const editPrinter = (printer) => {
-    setPrinterForm({ ...printer });
-    setEditingPrinterId(printer.id);
+  const editPrinter = (item) => {
+    setPrinterForm({ ...item });
+    setEditingPrinterId(item.id);
   };
 
   const cancelPrinterEdit = () => {
-    setPrinterForm({ name: '', location: '', model: '', serial: '', ipAddress: '', status: 'active'});
+    resetPrinterForm();
     setEditingPrinterId(null);
   };
 
-  // --- Функции для картриджей ---
-  const submitCartridge = () => {
-    if (editingCartridgeId !== null) {
-      setCartridges(cartridges.map(p =>
-        p.id === editingCartridgeId ? { ...cartridgeForm, id: editingCartridgeId } : p
-      ));
+  const resetPrinterForm = () => {
+    setPrinterForm({ name: '', location: '', model: '', serial: '', ipAddress: '', status: 'active' });
+  };
+
+  // --- Картриджи ---
+  const submitCartridge = async () => {
+    const id = editingCartridgeId || Date.now();
+    const cartridge = { id, ...cartridgeForm };
+    if (editingCartridgeId) {
+      await api.updateCartridge(cartridge);
+      setCartridges(prev => prev.map(c => c.id === editingCartridgeId ? cartridge : c));
       setEditingCartridgeId(null);
     } else {
-      setCartridges([...cartridges, { ...cartridgeForm, id: Date.now() }]);
+      await api.addCartridge(cartridge);
+      setCartridges(prev => [...prev, cartridge]);
     }
-    setCartridgeForm({ printerModel: '', cartridgeModel: '', quantity: ''});
+    resetCartridgeForm();
   };
 
-  const deleteCartridge = (id) => {
+  const deleteCartridge = async (id) => {
     if (window.confirm('Удалить картридж?')) {
-      setCartridges(cartridges.filter(p => p.id !== id));
+      await api.deleteCartridge(id);
+      setCartridges(prev => prev.filter(c => c.id !== id));
     }
   };
 
-  const editCartridge = (cartridge) => {
-    setCartridgeForm({ ...cartridge });
-    setEditingCartridgeId(cartridge.id);
+  const editCartridge = (item) => {
+    setCartridgeForm({ ...item });
+    setEditingCartridgeId(item.id);
   };
 
   const cancelCartridgeEdit = () => {
-    setCartridgeForm({ printerModel: '', cartridgeModel: '', quantity: ''});
+    resetCartridgeForm();
     setEditingCartridgeId(null);
   };
 
-  // --- Экспорт / импорт для активной вкладки ---
+  const resetCartridgeForm = () => {
+    setCartridgeForm({ printerModel: '', cartridgeModel: '', quantity: '' });
+  };
+
+  // --- Экспорт / Импорт ---
   const exportData = () => {
-    if (activeTab === 'notebook') {
-      const data = notebooks;
-      const fileName = 'notebooks_backup.json';
-      downloadJSON(data, fileName);
-    } else if (activeTab === 'equipment') {
-      if (equipmentRef.current) {
-        const data = equipmentRef.current.exportData();
-        const fileName = 'equipment_warehouses_backup.json';
-        downloadJSON(data, fileName);
-      }
-    } else if (activeTab === 'printers') {
-      const data = printers;
-      const fileName = 'printers_backup.json';
-      downloadJSON(data, fileName);
-    } else if (activeTab === 'cartridges') {
-      const data = cartridges;
-      const fileName = 'cartridges_backup.json';
-      downloadJSON(data, fileName);
+    const data = activeTab === 'notebook' ? notebooks
+              : activeTab === 'printers' ? printers
+              : activeTab === 'cartridges' ? cartridges
+              : null;
+    if (data) {
+      const fileName = `${activeTab}_backup.json`;
+      const dataStr = JSON.stringify(data, null, 2);
+      const blob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      a.click();
+      URL.revokeObjectURL(url);
+    } else if (activeTab === 'equipment' && equipmentRef.current) {
+      equipmentRef.current.exportData().then(exported => {
+        const dataStr = JSON.stringify(exported, null, 2);
+        const blob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'equipment_backup.json';
+        a.click();
+        URL.revokeObjectURL(url);
+      });
     }
   };
 
-  const importData = (importedData) => {
-    if (activeTab === 'notebook') {
-      setNotebooks(importedData);
-      alert('Импорт ноутбуков успешен!');
-    } else if (activeTab === 'equipment') {
-      if (equipmentRef.current) {
-        const success = equipmentRef.current.importData(importedData);
-        if (success) {
-          alert('Импорт складов успешен!');
-        } else {
-          alert('Неверный формат данных для складов. Требуется объект с warehouse1, warehouse2, warehouse3');
+  const importData = async (importedData) => {
+    try {
+      if (activeTab === 'notebook') {
+        for (const item of importedData) {
+          await api.addNotebook(item);
         }
+        setNotebooks(await api.getNotebooks());
+      } else if (activeTab === 'printers') {
+        for (const item of importedData) {
+          await api.addPrinter(item);
+        }
+        setPrinters(await api.getPrinters());
+      } else if (activeTab === 'cartridges') {
+        for (const item of importedData) {
+          await api.addCartridge(item);
+        }
+        setCartridges(await api.getCartridges());
+      } else if (activeTab === 'equipment' && equipmentRef.current) {
+        await equipmentRef.current.importData(importedData);
       }
-    } else if (activeTab === 'printers') {
-      setPrinters(importedData);
-      alert('Импорт принтеров успешен!');
-    } else if (activeTab === 'cartridges') {
-      setCartridges(importedData);
-      alert('Импорт картриджей успешен!');
+      alert('Импорт завершён');
+    } catch (err) {
+      alert('Ошибка импорта: ' + err.message);
     }
-  };
-
-  // Вспомогательная функция скачивания
-  const downloadJSON = (data, fileName) => {
-    const dataStr = JSON.stringify(data, null, 2);
-    const blob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = fileName;
-    a.click();
-    URL.revokeObjectURL(url);
   };
 
   const tabs = [
@@ -197,11 +221,9 @@ function App() {
             editingId={editingNotebookId}
             onCancel={cancelNotebookEdit}
           />
-          <NotebookTable
-            notebooks={notebooks}
-            onEdit={editNotebook}
-            onDelete={deleteNotebook}
-          />
+          {notebooksLoading ? <p className="empty-message">Загрузка...</p> :
+            <NotebookTable notebooks={notebooks} onEdit={editNotebook} onDelete={deleteNotebook} />
+          }
         </div>
       )}
 
@@ -216,11 +238,9 @@ function App() {
             editingId={editingPrinterId}
             onCancel={cancelPrinterEdit}
           />
-          <PrinterTable
-            printers={printers}
-            onEdit={editPrinter}
-            onDelete={deletePrinter}
-          />
+          {printersLoading ? <p className="empty-message">Загрузка...</p> :
+            <PrinterTable printers={printers} onEdit={editPrinter} onDelete={deletePrinter} />
+          }
         </div>
       )}
 
@@ -233,11 +253,9 @@ function App() {
             editingId={editingCartridgeId}
             onCancel={cancelCartridgeEdit}
           />
-          <CartridgeTable
-            cartridges={cartridges}
-            onEdit={editCartridge}
-            onDelete={deleteCartridge}
-          />
+          {cartridgesLoading ? <p className="empty-message">Загрузка...</p> :
+            <CartridgeTable cartridges={cartridges} onEdit={editCartridge} onDelete={deleteCartridge} />
+          }
         </div>
       )}
 

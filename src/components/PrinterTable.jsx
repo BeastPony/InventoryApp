@@ -35,7 +35,6 @@ export function PrinterTable({ printers, onEdit, onDelete }) {
                 {printerStatusLabels[printer.status] || printer.status}
               </span>
             </td>
-            {/* <td>{printer.lastService || '—'}</td> */}
             <td>
               <button onClick={() => onEdit(printer)} className="edit-btn">&#9998;</button>
               <button onClick={() => onDelete(printer.id)} className="delete-btn">&#128465;</button>
