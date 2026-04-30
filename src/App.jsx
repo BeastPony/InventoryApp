@@ -245,9 +245,35 @@ function App() {
             editingId={editingPrinterId}
             onCancel={cancelPrinterEdit}
           />
-          {printersLoading ? <p className="empty-message">Загрузка...</p> :
-            <PrinterTable printers={printers} onEdit={editPrinter} onDelete={deletePrinter} />
-          }
+          <div style={{ marginBottom: '10px' }}>
+            <button
+              className="export-btn"   // или любой другой класс на ваш вкус
+              onClick={async () => {
+                try {
+                  await fetch('/api/printers/ping-all', { method: 'POST' });
+                  alert('Пинг запущен. Дождитесь обновления статусов.');
+                  // Обновим список принтеров через несколько секунд
+                  setTimeout(async () => {
+                    const fresh = await api.getPrinters();
+                    setPrinters(fresh);
+                  }, 5000); // даём время на выполнение пинга (можно и меньше, но безопаснее)
+                } catch (err) {
+                  alert('Ошибка при запуске пинга');
+                }
+              }}
+            >
+              🔄 Пропинговать всё
+            </button>
+          </div>
+          {printersLoading ? (
+            <p className="empty-message">Загрузка...</p>
+          ) : (
+            <PrinterTable
+              printers={printers}
+              onEdit={editPrinter}
+              onDelete={deletePrinter}
+            />
+          )}
         </div>
       )}
 
