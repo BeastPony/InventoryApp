@@ -10,6 +10,8 @@ Built with React, Vite, Node.js, Express, and PostgreSQL.
 - Add, edit, and delete items
 - Import/Export current tab data as JSON
 - Data persists in PostgreSQL
+- Automatic printer monitoring via ICMP ping (online/offline status)
+- Manual "Ping all" button for instant status update
 
 ## Tech Stack
 
@@ -18,7 +20,7 @@ Built with React, Vite, Node.js, Express, and PostgreSQL.
 | Frontend    | React 18, Vite, CSS                 |
 | Backend     | Node.js, Express                    |
 | Database    | PostgreSQL                          |
-| Libraries   | pg, cors, dotenv, nodemon (dev)     |
+| Libraries   | pg, cors, dotenv, node-cron, nodemon (dev) |
 
 ## Getting Started
 
@@ -26,6 +28,7 @@ Built with React, Vite, Node.js, Express, and PostgreSQL.
 
 - **Node.js** v18 or higher
 - **PostgreSQL** server (local or remote)
+- **For printer monitoring:** the server must be able to send ICMP pings (network/firewall)
 
 ### 1. Clone the repository
 
@@ -80,6 +83,8 @@ Create a `.env` file inside the `server` folder:
     DB_PORT=5432
     DB_NAME=it_equipment
     PORT=3001
+    # Optional: printer ping interval in minutes (default 20)
+    PING_INTERVAL_MINUTES=20
 
 Replace the values with the credentials you chose in step 3.
 
@@ -90,7 +95,8 @@ Replace the values with the credentials you chose in step 3.
     cd server
     npm run dev
 
-The API will run on `http://localhost:3001`.
+The API will run on `http://localhost:3001`.  
+Printer monitoring will start automatically and run at the interval configured in `.env`.
 
 **Start the frontend**
 
@@ -128,12 +134,22 @@ Then open the app on any device in the same network using:
 
     server/              Express API + PostgreSQL connection
       routes/            API endpoints
+      services/          Background tasks (printer ping)
+        pingService.js
       schema.sql         Database tables and initial data
     src/                 React frontend
       components/        UI components
       hooks/             Custom hooks
       utils/             CamelCase ↔ snake_case helpers
       api.js             API client
+
+## Printer monitoring
+
+- The server periodically pings all printers that are **not** manually marked as "Отсутствует" (offline) or "Неисправен" (broken).
+- If the printer replies, its status is set to `active` (Работает), otherwise to `maintenance` (Выключен).
+- A "Пропинговать всё" button in the Printers tab triggers an immediate ping round.
+- The ping interval can be changed via the `PING_INTERVAL_MINUTES` variable in `server/.env`.
+- **Dependencies:** The automatic scheduler uses `node-cron`, which is already included in `server/package.json`. It will be installed when you run `npm install` inside the `server` folder.
 
 ## Customization
 
