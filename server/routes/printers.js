@@ -1,11 +1,22 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../db');
+const { pingAllPrinters } = require('../services/pingService');
 
 router.get('/', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM printers ORDER BY id');
     res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.post('/ping-all', async (req, res) => {
+  try {
+    // Запускаем пинг без ожидания ответа, чтобы не блокировать запрос
+    pingAllPrinters(); // выполняется асинхронно
+    res.json({ message: 'Ping started for eligible printers' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
