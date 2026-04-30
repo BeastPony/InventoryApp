@@ -36,7 +36,7 @@ export function NotebookForm({ formData, setFormData, onSubmit, editingId, onCan
       <input
         type="text"
         name="location"
-        placeholder="Место хранения"
+        placeholder="Место нахождения"
         value={formData.location || ''}
         onChange={handleChange}
       />

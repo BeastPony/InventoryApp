@@ -1,7 +1,8 @@
 const printerStatusLabels = {
   active: 'Работает',
-  maintenance: 'Обслуживание',
-  offline: 'Неисправен'
+  maintenance: 'Выключен',
+  offline: 'Отсутствует',
+  broken: 'Неисправен'
 };
 
 export function PrinterTable({ printers, onEdit, onDelete }) {

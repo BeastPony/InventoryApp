@@ -49,8 +49,9 @@ export function PrinterForm({ formData, setFormData, onSubmit, editingId, onCanc
       />
       <select name="status" value={formData.status || 'active'} onChange={handleChange}>
         <option value="active">Работает</option>
-        <option value="maintenance">Обслуживание</option>
-        <option value="offline">Неисправен</option>
+        <option value="maintenance">Выключен</option>
+        <option value="offline">Отсутствует</option>
+        <option value="broken">Неисправен</option>
       </select>
       <button type="submit">{editingId !== null ? 'Сохранить' : '➕ Добавить принтер'}</button>
       {editingId !== null && (

@@ -1,6 +1,6 @@
-* {
+/* * {
   box-sizing: border-box;
-}
+} */
 
 body {
   font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
@@ -131,7 +131,7 @@ h1 {
 }
 
 .data-table tbody tr {
-   background: #e4e4e4;
+  background: #e4e4e4;
 }
 
 .data-table tbody tr:hover {
@@ -149,7 +149,8 @@ h1 {
 .status-active { background: #dcfce7; color: #15803d; }
 .status-repair, .status-maintenance { background: #fed7aa; color: #9a3412; }
 .status-stock, .status-maintenance { background: #ff9101; color: #e5ff00; }
-.status-offline { background: #fee2e2; color: #b91c1c; }
+.status-offline { background: #d6d6d6; color: #494949; }
+.status-broken { background: #fee2e2; color: #b91c1c; }
 .status-storage { background: #e0e7ff; color: #3730a3; }
 .status-written_off { background: #e2e8f0; color: #334155; }
 
