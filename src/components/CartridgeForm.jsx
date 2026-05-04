@@ -33,7 +33,7 @@ export function CartridgeForm({ formData, setFormData, onSubmit, editingId, onCa
         value={formData.quantity || ''}
         onChange={handleChange}
       />
-      <button type="submit">{editingId !== null ? 'Сохранить' : '➕ Добавить картридж'}</button>
+      <button type="submit">{editingId !== null ? 'Сохранить' : 'Добавить картридж' }</button>
       {editingId !== null && (
         <button type="button" onClick={onCancel} className="cancel-btn">Отмена</button>
       )}

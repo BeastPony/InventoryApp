@@ -51,7 +51,7 @@ export function EquipmentForm({ formData, setFormData, onSubmit, editingId, onCa
         <option value="active">В наличии</option>
         <option value="stock">Отсутствует</option>
       </select>
-      <button type="submit">{editingId !== null ? 'Сохранить' : '➕ Добавить'}</button>
+      <button type="submit">{editingId !== null ? 'Сохранить' : 'Добавить'}</button>
       {editingId !== null && (
         <button type="button" onClick={onCancel} className="cancel-btn">Отмена</button>
       )}

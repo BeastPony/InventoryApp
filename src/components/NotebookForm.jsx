@@ -58,7 +58,7 @@ export function NotebookForm({ formData, setFormData, onSubmit, editingId, onCan
         <option value="active">Используется</option>
         <option value="stock">В запасе</option>
       </select>
-      <button type="submit">{editingId !== null ? 'Сохранить' : '➕ Добавить'}</button>
+      <button type="submit">{editingId !== null ? 'Сохранить' : 'Добавить'}</button>
       {editingId !== null && (
         <button type="button" onClick={onCancel} className="cancel-btn">Отмена</button>
       )}

@@ -262,7 +262,7 @@ function App() {
                 }
               }}
             >
-              🔄 Пропинговать всё
+              Запустить ping хостов &#8635;
             </button>
           </div>
           {printersLoading ? (

@@ -53,7 +53,7 @@ export function PrinterForm({ formData, setFormData, onSubmit, editingId, onCanc
         <option value="offline">Отсутствует</option>
         <option value="broken">Неисправен</option>
       </select>
-      <button type="submit">{editingId !== null ? 'Сохранить' : '➕ Добавить принтер'}</button>
+      <button type="submit">{editingId !== null ? 'Сохранить' : 'Добавить принтер'}</button>
       {editingId !== null && (
         <button type="button" onClick={onCancel} className="cancel-btn">Отмена</button>
       )}

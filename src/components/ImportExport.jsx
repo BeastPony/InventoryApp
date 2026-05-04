@@ -21,9 +21,9 @@ export function ImportExport({ onExport, onImport }) {
 
   return (
     <div className="export-section">
-      <button onClick={onExport} className="export-btn">&#10514; Экспорт (JSON)</button>
+      <button onClick={onExport} className="export-btn">&#11015; Экспорт (JSON)</button>
       <label className="import-btn">
-        &#128448; Импорт
+        	&#11014; Импорт
         <input type="file" accept=".json" onChange={handleImport} style={{ display: 'none' }} />
       </label>
     </div>
