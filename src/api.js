@@ -18,16 +18,37 @@ export const api = {
   // Ноутбуки
   getNotebooks: async () => {
     const data = await request('/notebooks');
-    return data.map(item => objectToCamelCase(item));
+    return data.map(item => {
+      const camel = objectToCamelCase(item);
+      // Принудительно маппим current_user_name обратно в currentUser
+      camel.currentUser = camel.currentUserName || item.current_user_name || '';
+      delete camel.currentUserName;
+      return camel;
+    });
   },
-  addNotebook: (notebook) => request('/notebooks', {
-    method: 'POST',
-    body: JSON.stringify(objectToSnakeCase(notebook)),
-  }),
-  updateNotebook: (notebook) => request(`/notebooks/${notebook.id}`, {
-    method: 'PUT',
-    body: JSON.stringify(objectToSnakeCase(notebook)),
-  }),
+  addNotebook: (notebook) => {
+    const snake = objectToSnakeCase(notebook);
+    // подменяем current_user -> current_user_name
+    if (snake.current_user !== undefined) {
+      snake.current_user_name = snake.current_user;
+      delete snake.current_user;
+    }
+    return request('/notebooks', {
+      method: 'POST',
+      body: JSON.stringify(snake),
+    });
+  },
+  updateNotebook: (notebook) => {
+    const snake = objectToSnakeCase(notebook);
+    if (snake.current_user !== undefined) {
+      snake.current_user_name = snake.current_user;
+      delete snake.current_user;
+    }
+    return request(`/notebooks/${notebook.id}`, {
+      method: 'PUT',
+      body: JSON.stringify(snake),
+    });
+  },
   deleteNotebook: (id) => request(`/notebooks/${id}`, { method: 'DELETE' }),
 
   // Принтеры

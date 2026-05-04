@@ -43,6 +43,9 @@ function App() {
   });
   const [editingCartridgeId, setEditingCartridgeId] = useState(null);
 
+  // --- Фильтр для ноутбуков ---
+  const [notebookFilter, setNotebookFilter] = useState('all');
+
   // --- Ноутбуки ---
   const submitNotebook = async () => {
     const id = editingNotebookId || Date.now();
@@ -228,9 +231,38 @@ function App() {
             editingId={editingNotebookId}
             onCancel={cancelNotebookEdit}
           />
-          {notebooksLoading ? <p className="empty-message">Загрузка...</p> :
-            <NotebookTable notebooks={notebooks} onEdit={editNotebook} onDelete={deleteNotebook} />
-          }
+          <div className="filter-bar" style={{ marginBottom: '10px' }}>
+            <select
+              value={notebookFilter}
+              onChange={(e) => setNotebookFilter(e.target.value)}
+              style={{
+                padding: '8px 12px',
+                fontSize: '0.9rem',
+                borderRadius: '5px',
+                border: '1px solid #9ffd79',
+                background: 'white',
+                cursor: 'pointer',
+              }}
+            >
+              <option value="all">Все</option>
+              <option value="active">Используется</option>
+              <option value="stock">В запасе</option>
+            </select>
+          </div>
+
+          {notebooksLoading ? (
+            <p className="empty-message">Загрузка...</p>
+          ) : (
+            <NotebookTable
+              notebooks={
+                notebookFilter === 'all'
+                  ? notebooks
+                  : notebooks.filter(n => n.status === notebookFilter)
+              }
+              onEdit={editNotebook}
+              onDelete={deleteNotebook}
+            />
+          )}
         </div>
       )}
 
