@@ -95,15 +95,34 @@ export const EquipmentSection = forwardRef((props, ref) => {
   };
 
   const exportData = async () => {
-    const allEquipment = await api.getAllEquipment();
-    return { warehouses, equipment: allEquipment };
-  };
+    return equipment;
+  }
 
   const importData = async (importedData) => {
+    if (Array.isArray(importedData)) {
+      for (const item of importedData) {
+        const eq = {
+          id: item.id || Date.now().toString(),
+          type: item.type || '',
+          firma: item.firma || '',
+          model: item.model || '',
+          quantity: item.quantity || '',
+          comment: item.comment || '',
+          status: item.status || 'active',
+          warehouse_id: selectedWarehouse?.id
+        };
+        await api.addEquipment(eq);
+      }
+      if (selectedWarehouse) {
+        loadEquipment(selectedWarehouse.id);
+      }
+      return true;
+    }
+
     if (importedData && importedData.equipment && Array.isArray(importedData.equipment)) {
       for (const item of importedData.equipment) {
         const eq = {
-          id: item.id,
+          id: item.id || Date.now().toString(),
           type: item.type || '',
           firma: item.firma || '',
           model: item.model || '',
@@ -119,6 +138,7 @@ export const EquipmentSection = forwardRef((props, ref) => {
       }
       return true;
     }
+
     return false;
   };
 
