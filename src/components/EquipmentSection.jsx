@@ -142,6 +142,52 @@ export const EquipmentSection = forwardRef((props, ref) => {
     return false;
   };
 
+  const handlePrint = () => {
+    const columns = [
+      { key: 'type', label: 'Тип оборудования' },
+      { key: 'firma', label: 'Фирма' },
+      { key: 'model', label: 'Модель' },
+      { key: 'quantity', label: 'Количество' },
+      { key: 'comment', label: 'Комментарий' },
+      { key: 'status', label: 'Статус' }
+    ];
+
+    const rowsHtml = equipment.map(row => `
+      <tr>
+        <td>${row.type || '—'}</td>
+        <td>${row.firma || '—'}</td>
+        <td>${row.model || '—'}</td>
+        <td>${row.quantity || '—'}</td>
+        <td>${row.comment || '—'}</td>
+        <td>${row.status || '—'}</td>
+      </tr>
+    `).join('');
+
+    const title = `Оборудование – ${selectedWarehouse?.label || ''}`;
+    const html = `<!DOCTYPE html>
+      <html><head><title>${title}</title>
+      <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #000; padding: 6px; text-align: left; }
+        th { background-color: #f2f2f2; }
+      </style></head>
+      <body>
+        <h2>${title}</h2>
+        <table>
+          <thead><tr>${columns.map(c => `<th>${c.label}</th>`).join('')}</tr></thead>
+          <tbody>${rowsHtml}</tbody>
+        </table>
+      </body></html>`;
+
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(html);
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+    printWindow.onafterprint = () => printWindow.close();
+  };
+
   useImperativeHandle(ref, () => ({
     exportData,
     importData,
@@ -169,6 +215,9 @@ export const EquipmentSection = forwardRef((props, ref) => {
           editingId={editingEquipId}
           onCancel={cancelEquipmentEdit}
         />
+        <button onClick={handlePrint} className="print-btn">
+          &#128438; Печать
+        </button>
         {loading ? (
           <p className="empty-message">Загрузка...</p>
         ) : (

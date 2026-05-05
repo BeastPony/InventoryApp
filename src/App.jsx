@@ -154,6 +154,81 @@ function App() {
     setCartridgeForm({ printerModel: '', cartridgeModel: '', quantity: '' });
   };
 
+  const printTable = (columns, data, title) => {
+    const rowsHtml = data.map(row => `
+      <tr>
+        ${columns.map(col => `<td>${row[col.key] || '—'}</td>`).join('')}
+      </tr>
+    `).join('');
+
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head><title>${title}</title>
+      <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #000; padding: 6px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        h2 { text-align: center; }
+      </style>
+      </head>
+      <body>
+        <h2>${title}</h2>
+        <table>
+          <thead><tr>${columns.map(c => `<th>${c.label}</th>`).join('')}</tr></thead>
+          <tbody>${rowsHtml}</tbody>
+        </table>
+      </body>
+      </html>`;
+
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(html);
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+    printWindow.onafterprint = () => printWindow.close();  // закрыть после печати
+  };
+
+  // Печать ноутбуков
+const printNotebooks = () => {
+  const columns = [
+    { key: 'invNumber', label: 'Инв. номер' },
+    { key: 'computerName', label: 'Имя компьютера' },
+    { key: 'currentUser', label: 'Текущий юзер' },
+    { key: 'location', label: 'Место хранения' },
+    { key: 'serviceTag', label: 'Service Tag' },
+    { key: 'model', label: 'Модель' },
+    { key: 'status', label: 'Статус' }
+  ];
+  // Для статуса можно вывести "Используется"/"В запасе" как в таблице, но оставим пока исходное значение
+  printTable(columns, notebooks, 'Ноутбуки');
+};
+
+// Печать принтеров
+const printPrinters = () => {
+  const columns = [
+    { key: 'name', label: 'Имя' },
+    { key: 'location', label: 'Локация' },
+    { key: 'model', label: 'Модель принтера' },
+    { key: 'serial', label: 'Серийный номер' },
+    { key: 'ipAddress', label: 'IP Адрес' },
+    { key: 'status', label: 'Статус' }
+  ];
+  printTable(columns, printers, 'Принтеры');
+};
+
+// Печать картриджей
+const printCartridges = () => {
+  const columns = [
+    { key: 'printerModel', label: 'Модель принтера' },
+    { key: 'cartridgeModel', label: 'Модель картриджа' },
+    { key: 'quantity', label: 'Количество' }
+  ];
+  printTable(columns, cartridges, 'Картриджи');
+};
+
+
   // --- Экспорт / Импорт ---
   const exportData = () => {
     const data = activeTab === 'notebook' ? notebooks
@@ -248,6 +323,9 @@ function App() {
               <option value="active">Используется</option>
               <option value="stock">В запасе</option>
             </select>
+            <button onClick={printNotebooks} className="print-btn" title="Печать таблицы">
+              &#128438; Печать
+            </button>
           </div>
 
           {notebooksLoading ? (
@@ -279,22 +357,24 @@ function App() {
           />
           <div style={{ marginBottom: '10px' }}>
             <button
-              className="export-btn"   // или любой другой класс на ваш вкус
+              className="export-btn"
               onClick={async () => {
                 try {
                   await fetch('/api/printers/ping-all', { method: 'POST' });
                   alert('Пинг запущен. Дождитесь обновления статусов.');
-                  // Обновим список принтеров через несколько секунд
                   setTimeout(async () => {
                     const fresh = await api.getPrinters();
                     setPrinters(fresh);
-                  }, 5000); // даём время на выполнение пинга (можно и меньше, но безопаснее)
+                  }, 5000); 
                 } catch (err) {
                   alert('Ошибка при запуске пинга');
                 }
               }}
             >
               Запустить ping хостов &#8635;
+            </button>
+            <button onClick={printPrinters} className="print-btn" title="Печать таблицы">
+              &#128438; Печать
             </button>
           </div>
           {printersLoading ? (
@@ -318,6 +398,9 @@ function App() {
             editingId={editingCartridgeId}
             onCancel={cancelCartridgeEdit}
           />
+          <button onClick={printCartridges} className="print-btn" title="Печать таблицы">
+            &#128438; Печать
+          </button>
           {cartridgesLoading ? <p className="empty-message">Загрузка...</p> :
             <CartridgeTable cartridges={cartridges} onEdit={editCartridge} onDelete={deleteCartridge} />
           }

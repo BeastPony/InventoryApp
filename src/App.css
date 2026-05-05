@@ -236,3 +236,23 @@ h1 {
   color: black;
   font-size: 1.2rem;
 }
+
+.print-btn {
+  padding: 8px 12px; 
+  font-size: 0.9rem; 
+  border-radius: 5px; 
+  border: 1px solid rgb(159, 253, 121); 
+  background: white; 
+  cursor: pointer;
+  margin: 10px 10px;
+}
+.print-btn:hover {
+  color: black;
+  background: #9ffd79;
+}
+
+@media print {
+  .print-btn {
+    display: none !important;
+  }
+}
